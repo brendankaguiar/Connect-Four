@@ -7,7 +7,6 @@ void play();
 int main()
 {
     Board connect_4;
-    connect_4.display_grid();
     setup();
     play();
     return 0;
@@ -19,18 +18,18 @@ void play()
     {
         for (int i = 0; i < 2; i++)
         {
-            cout << "\n\nPlayer " << i + 1 << ": make your move." << endl;
+            cout << "\n\nPlayer " << i + 1 << endl;
             board.make_move(player[i]);
             gameOver = board.check_for_winner(player[i]);
             if(gameOver)
             {
-                i = 2;
                 board.set_winner(player[i]);
+                board.display_grid();
+                cout << "Player " << i + 1 << " won.\n\n";
+                i = 2;
             }
         }
     }
-    board.display_grid();
-    cout << "Player " << board.get_winner() << " won.\n\n";
 }
 void setup()
 {
