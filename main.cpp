@@ -7,8 +7,22 @@ void play();
 int main()
 {
     Board connect_4;
-    setup();
-    play();
+    int num_players = 0;
+    bool grant = false;
+    while(!grant)
+    {
+        cout << "How many players? Between 1 and 2 please.\n\nChoose: ";
+        cin >> num_players;
+        if (num_players > 2 || num_players < 1)
+            cout << "Number of players out of range. Try again.\n\n";
+        else
+            grant = true;
+    }
+    if (num_players == 2)
+    {
+        setup();
+        play();
+    }
     return 0;
 }
 void play()
