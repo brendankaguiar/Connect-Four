@@ -27,6 +27,7 @@ public:
     void set_winner(Player p);
     char get_winner();
     bool check_diagN(Player p);
+    bool check_diagP(Player p);
     bool check_vertical(char _grid[][7], Player p);
     bool check_vert(char _grid[][7], int hoz);
 };
