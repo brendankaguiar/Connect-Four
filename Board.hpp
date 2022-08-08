@@ -21,7 +21,9 @@ private:
     char winner;
 public:
     Board();
+    void get_grid(int _grid[][7]);
     void make_move(Player p);
+    void make_move_AI(Player p, int _move);
     void display_grid();
     bool check_for_winner(Player p);
     void set_winner(Player p);
@@ -30,6 +32,8 @@ public:
     bool check_diagP(Player p);
     bool check_vertical(char _grid[][7], Player p);
     bool check_vert(char _grid[][7], int hoz);
+    char get_space(int row, int col);
+    bool check_for_tie();
 };
 
 #endif /* Board_hpp */
