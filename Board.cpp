@@ -34,6 +34,13 @@ void Board::display_grid()
         cout << endl;
     }
 }
+void Board::make_move_AI(Player p, int _move)
+{
+    int row = 0;
+    while (grid[row][_move] == 'O')
+        row++;
+    grid[row - 1][_move] = p.get_token();
+}
 void Board::make_move(Player p)
 {
     bool grant = false;
@@ -59,7 +66,6 @@ void Board::make_move(Player p)
 }
 bool Board::check_for_winner(Player p)
 {
-    //bool hoz = false;
     int aligned = 0;
     for (int row = 5; row >= 0; row--)//check horizontal
     {
@@ -85,6 +91,26 @@ bool Board::check_for_winner(Player p)
         return true;
     if (this->check_diagP(p))
         return true;
+    if (this->check_for_tie())
+        return true;
+    return false;
+}
+bool Board::check_for_tie()
+{
+    int count = 0;
+    for (int row = 0; row < 6; row++)
+    {
+        for (int col = 0; col < 7; col++)
+        {
+            if (grid[row][col] == 'O')
+                count++;
+        }
+    }
+    if (count == 42)
+    {
+        winner = 'T';//T for Tie
+        return true;
+    }
     return false;
 }
 bool Board::check_vertical(char _grid[][7], Player p)
@@ -168,4 +194,14 @@ bool Board::check_diagP(Player p)
     }
     return false;
 }
+void Board::get_grid(int _grid[][7])
+{
+    for (int row = 0; row < 6; row++)
+        for (int col = 0; col < 7; col++)
+            _grid[row][col] = int(grid[row][col]);
+}
 
+char Board::get_space(int row, int col)
+{
+    return grid[row][col];
+}
