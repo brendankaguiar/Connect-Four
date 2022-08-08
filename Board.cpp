@@ -79,9 +79,11 @@ bool Board::check_for_winner(Player p)
             }
         }
     }
-    if (this->check_vertical(grid, p))
+    if (this->check_vertical(grid, p))//check vertical
         return true;
-    if (this->check_diagN(p))
+    if (this->check_diagN(p))//check diagonal with negative slope
+        return true;
+    if (this->check_diagP(p))
         return true;
     return false;
 }
@@ -122,8 +124,8 @@ bool Board::check_diagN(Player p)
 {
     int start = 5;
     int shift = 3;
-    int stop = 3;
-    while(stop >= 1)
+    int stop = 2;
+    while(stop >= 0)
     {
         char transition[6][7];
         for (int row = start; row >= stop; row--)
@@ -142,3 +144,28 @@ bool Board::check_diagN(Player p)
     }
     return false;
 }
+bool Board::check_diagP(Player p)
+{
+    int start = 5;
+    int shift = 3;
+    int stop = 2;
+    while(stop >= 0)
+    {
+        char transition[6][7];
+        for (int row = start; row >= stop; row--)
+        {
+            for (int col = 6; col >= 3; col--)
+            {
+                transition[row][col] = grid[row][col - shift];
+            }
+            shift--;
+        }
+        if (this->check_vertical(transition, p))
+            return true;
+        stop--;
+        start--;
+        shift = 3;
+    }
+    return false;
+}
+
