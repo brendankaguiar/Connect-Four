@@ -1,0 +1,34 @@
+//
+//  Board.hpp
+//  Connect4
+//
+//  Created by Brendan Aguiar on 8/6/22.
+//
+
+#ifndef Board_hpp
+#define Board_hpp
+#include <iostream>
+#include <vector>
+#include <string>
+#include "Player.hpp"
+using namespace std;
+class Board
+{
+private:
+    char grid[7][7];
+    char rShift[11][7];
+    char lShift[11][7];
+    char winner;
+public:
+    Board();
+    void make_move(Player p);
+    void display_grid();
+    bool check_for_winner(Player p);
+    void set_winner(Player p);
+    char get_winner();
+    bool check_diagN(Player p);
+    bool check_vertical(char _grid[][7], Player p);
+    bool check_vert(char _grid[][7], int hoz);
+};
+
+#endif /* Board_hpp */
