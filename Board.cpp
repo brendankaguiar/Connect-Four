@@ -18,6 +18,22 @@ Board::Board()
                 grid[m][n] = '-';
         }
     }
+    winner = 'T';//Initialize to Tie
+}
+void Board::apply_states(int state[][7])
+{
+    for (int row = 0; row < 6; row++)
+    {
+        for (int col = 0; col < 7; col++)
+        {
+            if (grid[row][col] == '@')
+                state[row][col] = -1;
+            else if (grid[row][col] == '#')
+                state[row][col] = 1;
+            else
+                state[row][col] = 0;
+        }
+    }
 }
 
 void Board::display_grid()
@@ -37,9 +53,14 @@ void Board::display_grid()
 void Board::make_move_AI(Player p, int _move)
 {
     int row = 0;
-    while (grid[row][_move] == 'O')
-        row++;
-    grid[row - 1][_move] = p.get_token();
+    int i = 0;
+    while (i < 6)//search for row to place token into
+    {
+        if (grid[row - 1][_move] == 'O')
+            row++;
+        i++;
+    }
+    grid[row][_move] = p.get_token();
 }
 void Board::make_move(Player p)
 {
@@ -58,7 +79,7 @@ void Board::make_move(Player p)
         {
             grant = true;
             int m = 5;
-            while(grid[m][space] != 'O')
+            while (grid[m][space] != 'O')
                 m--;
             grid[m][space] = p.get_token();
         }
@@ -71,7 +92,7 @@ bool Board::check_for_winner(Player p)
     {
         for (int col = 6; col >= 0; col--)
         {
-            if(grid[row][col] == p.get_token())
+            if (grid[row][col] == p.get_token())
             {
                 aligned++;
                 if (aligned == 4)
@@ -85,13 +106,13 @@ bool Board::check_for_winner(Player p)
             }
         }
     }
-    if (this->check_vertical(grid, p))//check vertical
+    if (check_vertical(grid, p))//check vertical
         return true;
-    if (this->check_diagN(p))//check diagonal with negative slope
+    if (check_diagN(p))//check diagonal with negative slope
         return true;
-    if (this->check_diagP(p))
+    if (check_diagP(p))
         return true;
-    if (this->check_for_tie())
+    if (check_for_tie())
         return true;
     return false;
 }
@@ -115,12 +136,12 @@ bool Board::check_for_tie()
 }
 bool Board::check_vertical(char _grid[][7], Player p)
 {
-    int aligned =0;
+    int aligned = 0;
     for (int col = 6; col >= 0; col--)//check verticals
     {
         for (int row = 5; row >= 0; row--)
         {
-            if(_grid[row][col] == p.get_token())
+            if (_grid[row][col] == p.get_token())
             {
                 aligned++;
                 if (aligned == 4)
@@ -151,7 +172,7 @@ bool Board::check_diagN(Player p)
     int start = 5;
     int shift = 3;
     int stop = 2;
-    while(stop >= 0)
+    while (stop >= 0)
     {
         char transition[6][7];
         for (int row = start; row >= stop; row--)
@@ -162,7 +183,7 @@ bool Board::check_diagN(Player p)
             }
             shift--;
         }
-        if (this->check_vertical(transition, p))
+        if (check_vertical(transition, p))
             return true;
         stop--;
         start--;
@@ -175,7 +196,7 @@ bool Board::check_diagP(Player p)
     int start = 5;
     int shift = 3;
     int stop = 2;
-    while(stop >= 0)
+    while (stop >= 0)
     {
         char transition[6][7];
         for (int row = start; row >= stop; row--)
@@ -186,7 +207,7 @@ bool Board::check_diagP(Player p)
             }
             shift--;
         }
-        if (this->check_vertical(transition, p))
+        if (check_vertical(transition, p))
             return true;
         stop--;
         start--;
