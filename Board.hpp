@@ -16,11 +16,10 @@ class Board
 {
 private:
     char grid[7][7];
-    char rShift[11][7];
-    char lShift[11][7];
     char winner;
 public:
     Board();
+    void apply_states(int state[][7]);
     void get_grid(int _grid[][7]);
     void make_move(Player p);
     void make_move_AI(Player p, int _move);
@@ -31,7 +30,6 @@ public:
     bool check_diagN(Player p);
     bool check_diagP(Player p);
     bool check_vertical(char _grid[][7], Player p);
-    bool check_vert(char _grid[][7], int hoz);
     char get_space(int row, int col);
     bool check_for_tie();
 };
