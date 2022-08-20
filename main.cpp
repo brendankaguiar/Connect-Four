@@ -1,13 +1,13 @@
 #include "Board.hpp"
 #include "Player.hpp"
-#include "Minimax.hpp"
+#include "Minimax.h"
 Player player[2];
 Board board;
 int _winner = 0;
 int turn;
 void setup();
-void play();
 void single_player();
+void two_player();
 
 int main()
 {
@@ -22,26 +22,22 @@ int main()
         else
             grant = true;
     }
+    setup();
     if (num_players == 2)//Two Player Game
-    {
-        setup();
-        play();
-    }
+        two_player();
     else//AI based game
-    {
         single_player();
-    }
     return 0;
 }
 void single_player()
 {
-    setup();
+    cout << "working on it.\n";
     bool gameOver = false;
     int move[2];
     int state[6][7];
     while (!gameOver)
     {
-        cout << "\n\nPlayer " << 1 << endl;
+        cout << "\n\nPlayer " << 1 << endl;//player 1 moves
         board.make_move(player[0]);
         gameOver = board.check_for_winner(player[0].get_token());
         if (!gameOver)
@@ -60,7 +56,7 @@ void single_player()
     board.display_grid();
     cout << "Player " << board.get_winner() << " won.\n\n";
 }
-void play()
+void two_player()
 {
     bool gameOver = false;
     while (!gameOver)
@@ -72,9 +68,14 @@ void play()
             gameOver = board.check_for_winner(player[i].get_token());
             if (gameOver)
             {
-                board.set_winner(player[i]);
+                if (board.check_for_tie())
+                    cout << "It's a Tie!\n\n";
+                else
+                {
+                    board.set_winner(player[i]);
+                    cout << "Player " << i + 1 << " : " << player[i].get_token() << " won.\n\n";
+                }
                 board.display_grid();
-                cout << "Player " << i + 1 << " won.\n\n";
                 i = 2;
             }
         }
@@ -89,24 +90,5 @@ void setup()
         Player p(_token[i]);
         player[i] = p;
     }
-}
-
-
-void load_state(int _state[][7])
-{
-    for (int row = 0; row < 6; row++)
-    {
-        for (int col = 0; col < 7; col++)
-        {
-            char token = board.get_space(row, col);
-            if (token == '@')
-                _state[row][col] = 1;
-            else if (token == '#')
-                _state[row][col] = -1;
-            else
-                _state[row][col] = 0;
-            //cout << _state[row][col];
-        }
-        //cout << endl;
-    }
+    board.set_players(player);
 }
