@@ -7,62 +7,31 @@
 
 #include "Board.hpp"
 #include "Player.hpp"
+
 Board::Board()
 {
-    for (int m = 0; m < 7; m++)
+    for (int m = 0; m < 6; m++)
     {
         for (int n = 0; n < 7; n++)
-        {
-            grid[m][n] = 'O';
-            if (m == 6)
-                grid[m][n] = '-';
-        }
+            grid[m][n] = 0;
     }
     winner = 'T';//Initialize to Tie
 }
+
 void Board::apply_states(int state[][7])
 {
     for (int row = 0; row < 6; row++)
-    {
         for (int col = 0; col < 7; col++)
-        {
-            if (grid[row][col] == '@')
-                state[row][col] = -1;
-            else if (grid[row][col] == '#')
-                state[row][col] = 1;
-            else
-                state[row][col] = 0;
-        }
-    }
+            state[row][col] = grid[row][col];
 }
 
-void Board::display_grid()
+void Board::set_players(const Player p[])
 {
-    cout << endl;
-    for (int pos = 0; pos < 7; pos++)
-        cout << "   " << pos;
-    cout << endl << endl;
-    for (int m = 0; m < 7; m++)
-    {
-        cout << " | ";
-        for (int n = 0; n < 7; n++)
-            cout << grid[m][n] << " | ";
-        cout << endl;
-    }
+    for(int i = 0; i < 2; i++)
+        player[i] = p[i];
 }
-void Board::make_move_AI(Player p, int _move)
-{
-    int row = 0;
-    int i = 0;
-    while (i < 6)//search for row to place token into
-    {
-        if (grid[row - 1][_move] == 'O')
-            row++;
-        i++;
-    }
-    grid[row][_move] = p.get_token();
-}
-void Board::make_move(Player p)
+
+void Board::make_move(const Player& p)
 {
     bool grant = false;
     while (!grant)
@@ -73,26 +42,71 @@ void Board::make_move(Player p)
         cin >> space;
         if (space > 6 || space < 0)
             cout << "\n\nSpace out of bounds. Try again.\n\n";
-        else if (grid[0][space] != 'O')
+        else if (grid[0][space] != 0)
             cout << "\n\nSpace filled up. Try again.\n\n" << grid[0][space] << endl;
         else
         {
             grant = true;
             int m = 5;
-            while (grid[m][space] != 'O')
+            while (grid[m][space] != 0)
                 m--;
-            grid[m][space] = p.get_token();
+            if (p.get_token() == player[0].get_token())
+                grid[m][space] = -1;
+            else
+                grid[m][space] = 1;
         }
     }
 }
-bool Board::check_for_winner(Player p)
+
+void Board::display_grid() const
+{
+    cout << endl;
+    for (int pos = 0; pos < 7; pos++)
+        cout << "   " << pos;
+    cout << endl << endl;
+    for (int m = 0; m < 6; m++)
+    {
+        cout << " | ";
+        for (int n = 0; n < 7; n++)
+        {
+            if (grid[m][n] == -1)
+                cout << '@' << " | ";
+            else if (grid[m][n] == 1)
+                cout << '#' << " | ";
+            else
+                cout << 'O' << " | ";
+        }
+        cout << endl;
+    }
+}
+
+void Board::make_move_AI(const Player& p, const int& _move)
+{
+    int row = 1;
+    int i = 0;
+    while (i < 6)//search for row to place token into
+    {
+        if (grid[row - 1][_move] == 0)
+            row++;
+        i++;
+    }
+    grid[row][_move] = -1;//p.get_token();
+}
+
+
+bool Board::check_for_winner(const Player& p) const
 {
     int aligned = 0;
+    int utility;
+    if (p.get_token() == '@')
+        utility = -1;
+    else
+        utility = 1;
     for (int row = 5; row >= 0; row--)//check horizontal
     {
         for (int col = 6; col >= 0; col--)
         {
-            if (grid[row][col] == p.get_token())
+            if (grid[row][col] == utility)
             {
                 aligned++;
                 if (aligned == 4)
@@ -116,32 +130,38 @@ bool Board::check_for_winner(Player p)
         return true;
     return false;
 }
-bool Board::check_for_tie()
+
+
+bool Board::check_for_tie() const
 {
     int count = 0;
     for (int row = 0; row < 6; row++)
     {
         for (int col = 0; col < 7; col++)
         {
-            if (grid[row][col] == 'O')
+            if (grid[row][col] != 0)
                 count++;
         }
     }
     if (count == 42)
-    {
-        winner = 'T';//T for Tie
         return true;
-    }
     return false;
 }
-bool Board::check_vertical(char _grid[][7], Player p)
+
+
+bool Board::check_vertical(const int _grid[][7], const Player& p) const
 {
     int aligned = 0;
+    int utility;
+    if (p.get_token() == '@')
+        utility = -1;
+    else
+        utility = 1;
     for (int col = 6; col >= 0; col--)//check verticals
     {
         for (int row = 5; row >= 0; row--)
         {
-            if (_grid[row][col] == p.get_token())
+            if (_grid[row][col] == utility)
             {
                 aligned++;
                 if (aligned == 4)
@@ -159,22 +179,28 @@ bool Board::check_vertical(char _grid[][7], Player p)
     }
     return false;
 }
-char Board::get_winner()
+
+
+char Board::get_winner() const
 {
     return winner;
 }
-void Board::set_winner(Player p)
+
+
+void Board::set_winner(const Player& p)
 {
     winner = p.get_token();
 }
-bool Board::check_diagN(Player p)
+
+
+bool Board::check_diagN(const Player& p) const
 {
     int start = 5;
     int shift = 3;
     int stop = 2;
     while (stop >= 0)
     {
-        char transition[6][7];
+        int transition[6][7] = {};
         for (int row = start; row >= stop; row--)
         {
             for (int col = 0; col < 4; col++)
@@ -191,14 +217,15 @@ bool Board::check_diagN(Player p)
     }
     return false;
 }
-bool Board::check_diagP(Player p)
+
+bool Board::check_diagP(const Player& p) const
 {
     int start = 5;
     int shift = 3;
     int stop = 2;
     while (stop >= 0)
     {
-        char transition[6][7];
+        int transition[6][7] = {};
         for (int row = start; row >= stop; row--)
         {
             for (int col = 6; col >= 3; col--)
@@ -215,14 +242,9 @@ bool Board::check_diagP(Player p)
     }
     return false;
 }
-void Board::get_grid(int _grid[][7])
-{
-    for (int row = 0; row < 6; row++)
-        for (int col = 0; col < 7; col++)
-            _grid[row][col] = int(grid[row][col]);
-}
 
-char Board::get_space(int row, int col)
+
+int Board::get_space(const int& row, const int& col) const
 {
     return grid[row][col];
 }
