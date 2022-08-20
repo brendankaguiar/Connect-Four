@@ -12,11 +12,11 @@ public:
 	void result(int state[][7], int a);
 	void max_value(int state[][7], int move[]);
 	void min_value(int state[][7], int move[]);
-	bool check_for_winner(int state[][7], int player);
-	bool check_vertical(int state[][7], int player);
-	bool check_diagN(int player, int grid[][7]);
-	bool check_diagP(int player, int grid[][7]);
-	bool check_for_tie(int grid[][7]);
+	bool check_for_winner(const int state[][7], const int utility) const;
+	bool check_vertical(const int state[][7], const int utility) const;
+	bool check_diagN(const int state[][7], const int utility) const;
+	bool check_diagP(const int state[][7], const int utility) const;
+	bool check_for_tie(const int state[][7]) const;
 private:
 	int transition[6][7];
 	int player;
