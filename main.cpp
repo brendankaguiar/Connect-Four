@@ -1,16 +1,23 @@
-#include "Board.hpp"
-#include "Player.hpp"
-#include "Minimax.h"
-Player player[2];
-Board board;
-int _winner = 0;
-int turn;
-void setup();
+//
+//  main.cpp
+//  Template Practice
+//
+//  Created by Brendan Aguiar on 8/24/22.
+//
+#include <iostream>
+using namespace std;
+#include "Player.cpp"
+#include "Board.cpp"
+#include "Minimax.hpp"
+void two_setup();
+void one_setup();
 void single_player();
 void two_player();
-
-int main()
-{
+Board<char> board('O');
+Player<char> player[2];
+Player<int> AIplayer[2];
+Board<int> AIboard(0);
+int main() {
     int num_players = 0;
     bool grant = false;
     while (!grant)
@@ -22,42 +29,38 @@ int main()
         else
             grant = true;
     }
-    setup();
     if (num_players == 2)//Two Player Game
         two_player();
     else//AI based game
         single_player();
     return 0;
 }
-void single_player()
+
+void two_setup()
 {
-    cout << "working on it.\n";
-    bool gameOver = false;
-    int move[2];
-    int state[6][7];
-    while (!gameOver)
+    char _token[2] = { '@', '#' };
+    for (int i = 0; i < 2; i++)
     {
-        cout << "\n\nPlayer " << 1 << endl;//player 1 moves
-        board.make_move(player[0]);
-        gameOver = board.check_for_winner(player[0].get_token());
-        if (!gameOver)
-        {
-            board.apply_states(state);
-            Minimax game;
-            game.max_value(state, move);
-            board.make_move_AI(player[1], move[0]);
-            gameOver = board.check_for_winner(player[1].get_token());
-            if (gameOver)
-                board.set_winner(player[1]);
-        }
-        else
-            board.set_winner(player[0]);
+        cout << "Player " << i + 1 << ": " << _token[i] << " is your token.\n";
+        Player<char> p(_token[i]);
+        player[i] = p;
     }
-    board.display_grid();
-    cout << "Player " << board.get_winner() << " won.\n\n";
+    board.set_players(player);
+}
+void one_setup()
+{
+    int _token[2] = {-1, 1};
+    char token[2] = { '@', '#' };
+    for (int i = 0; i < 2; i++)
+    {
+        cout << "Player " << i + 1 << ": " << token[i] << " is your token.\n";
+        Player<int> p(_token[i]);
+        AIplayer[i] = p;
+    }
 }
 void two_player()
 {
+    two_setup();
     bool gameOver = false;
     while (!gameOver)
     {
@@ -81,14 +84,29 @@ void two_player()
         }
     }
 }
-void setup()
+void single_player()
 {
-    char _token[2] = { '@', '#' };
-    for (int i = 0; i < 2; i++)
-    {
-        cout << "Player " << i + 1 << ": " << _token[i] << " is your token.\n";
-        Player p(_token[i]);
-        player[i] = p;
-    }
-    board.set_players(player);
+    one_setup();
+    bool gameOver = false;
+    int move[2];
+    int state[6][7];
+    while (!gameOver)
+   {
+       cout << "\n\nPlayer " << 1 << endl;//player 1 moves
+       AIboard.make_move(AIplayer[0]);
+       gameOver = AIboard.check_for_winner(AIplayer[0].get_token());
+       if (!gameOver)
+       {
+           Minimax game;
+           game.max_value(state, move);
+           AIboard.make_move_AI(move[0]);
+           gameOver = AIboard.check_for_winner(AIplayer[1].get_token());
+           if (gameOver)
+               AIboard.set_winner(AIplayer[1]);
+       }
+       else
+                   AIboard.set_winner(AIplayer[0]);
+   }
+    AIboard.display_grid();
+    cout << "Player " << AIboard.get_winner() << " won.\n\n";
 }
