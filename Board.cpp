@@ -1,37 +1,32 @@
 //
 //  Board.cpp
-//  Connect4
+//  Template Practice
 //
-//  Created by Brendan Aguiar on 8/6/22.
+//  Created by Brendan Aguiar on 8/24/22.
 //
 
 #include "Board.hpp"
-#include "Player.hpp"
 
-Board::Board()
+template <typename Datatype>
+Board<Datatype>::Board(Datatype _empty_space)
 {
     for (int m = 0; m < 6; m++)
     {
         for (int n = 0; n < 7; n++)
-            grid[m][n] = 0;
+            grid[m][n] = _empty_space;
     }
+    empty_space = _empty_space;
     winner = 'T';//Initialize to Tie
 }
 
-void Board::apply_states(int state[][7])
-{
-    for (int row = 0; row < 6; row++)
-        for (int col = 0; col < 7; col++)
-            state[row][col] = grid[row][col];
-}
-
-void Board::set_players(const Player p[])
+template <typename Datatype>
+void Board<Datatype>::set_players(const Player<Datatype> p[])
 {
     for(int i = 0; i < 2; i++)
         player[i] = p[i];
 }
-
-void Board::make_move(const Player& p)
+template <typename Datatype>
+void Board<Datatype>::make_move(const Player<Datatype>& p)
 {
     bool grant = false;
     while (!grant)
@@ -42,23 +37,36 @@ void Board::make_move(const Player& p)
         cin >> space;
         if (space > 6 || space < 0)
             cout << "\n\nSpace out of bounds. Try again.\n\n";
-        else if (grid[0][space] != 0)
+        else if (grid[0][space] != empty_space)
             cout << "\n\nSpace filled up. Try again.\n\n" << grid[0][space] << endl;
         else
         {
             grant = true;
             int m = 5;
-            while (grid[m][space] != 0)
+            while (grid[m][space] != empty_space)
                 m--;
             if (p.get_token() == player[0].get_token())
-                grid[m][space] = -1;
+                grid[m][space] = p.get_token();
             else
-                grid[m][space] = 1;
+                grid[m][space] = player[1].get_token();
         }
     }
 }
-
-void Board::display_grid() const
+template <typename Datatype>
+void Board<Datatype>::make_move_AI(const int& _move)
+{
+    int row = 1;
+    int i = 0;
+    while (i < 6)//search for row to place token into
+    {
+        if (grid[row - 1][_move] == empty_space)
+            row++;
+        i++;
+    }
+    grid[row][_move] = -1;
+}
+template <typename Datatype>
+void Board<Datatype>::display_grid() const
 {
     cout << endl;
     for (int pos = 0; pos < 7; pos++)
@@ -69,9 +77,9 @@ void Board::display_grid() const
         cout << " | ";
         for (int n = 0; n < 7; n++)
         {
-            if (grid[m][n] == -1)
+            if (grid[m][n] == player[0].get_token())
                 cout << '@' << " | ";
-            else if (grid[m][n] == 1)
+            else if (grid[m][n] == player[1].get_token())
                 cout << '#' << " | ";
             else
                 cout << 'O' << " | ";
@@ -79,29 +87,15 @@ void Board::display_grid() const
         cout << endl;
     }
 }
-
-void Board::make_move_AI(const Player& p, const int& _move)
-{
-    int row = 1;
-    int i = 0;
-    while (i < 6)//search for row to place token into
-    {
-        if (grid[row - 1][_move] == 0)
-            row++;
-        i++;
-    }
-    grid[row][_move] = -1;//p.get_token();
-}
-
-
-bool Board::check_for_winner(const Player& p) const
+template <typename Datatype>
+bool Board<Datatype>::check_for_winner(const Player<Datatype>& p) const
 {
     int aligned = 0;
-    int utility;
-    if (p.get_token() == '@')
-        utility = -1;
+    Datatype utility;
+    if (p.get_token() == player[0].get_token())
+        utility = player[0].get_token();
     else
-        utility = 1;
+        utility = player[1].get_token();
     for (int row = 5; row >= 0; row--)//check horizontal
     {
         for (int col = 6; col >= 0; col--)
@@ -120,7 +114,7 @@ bool Board::check_for_winner(const Player& p) const
             }
         }
     }
-    if (check_vertical(grid, p))//check vertical
+    if (check_vertical(this->grid, p))//check vertical
         return true;
     if (check_diagN(p))//check diagonal with negative slope
         return true;
@@ -130,33 +124,15 @@ bool Board::check_for_winner(const Player& p) const
         return true;
     return false;
 }
-
-
-bool Board::check_for_tie() const
-{
-    int count = 0;
-    for (int row = 0; row < 6; row++)
-    {
-        for (int col = 0; col < 7; col++)
-        {
-            if (grid[row][col] != 0)
-                count++;
-        }
-    }
-    if (count == 42)
-        return true;
-    return false;
-}
-
-
-bool Board::check_vertical(const int _grid[][7], const Player& p) const
+template <typename Datatype>
+bool Board<Datatype>::check_vertical(const Datatype _grid[][7], const Player<Datatype>& p) const
 {
     int aligned = 0;
-    int utility;
-    if (p.get_token() == '@')
-        utility = -1;
+    Datatype utility;
+    if (p.get_token() == player[0].get_token())
+        utility = player[0].get_token();
     else
-        utility = 1;
+        utility = player[1].get_token();
     for (int col = 6; col >= 0; col--)//check verticals
     {
         for (int row = 5; row >= 0; row--)
@@ -179,53 +155,15 @@ bool Board::check_vertical(const int _grid[][7], const Player& p) const
     }
     return false;
 }
-
-
-char Board::get_winner() const
-{
-    return winner;
-}
-
-
-void Board::set_winner(const Player& p)
-{
-    winner = p.get_token();
-}
-
-
-bool Board::check_diagN(const Player& p) const
+template <typename Datatype>
+bool Board<Datatype>::check_diagP(const Player<Datatype>& p) const
 {
     int start = 5;
     int shift = 3;
     int stop = 2;
     while (stop >= 0)
     {
-        int transition[6][7] = {};
-        for (int row = start; row >= stop; row--)
-        {
-            for (int col = 0; col < 4; col++)
-            {
-                transition[row][col] = grid[row][col + shift];
-            }
-            shift--;
-        }
-        if (check_vertical(transition, p))
-            return true;
-        stop--;
-        start--;
-        shift = 3;
-    }
-    return false;
-}
-
-bool Board::check_diagP(const Player& p) const
-{
-    int start = 5;
-    int shift = 3;
-    int stop = 2;
-    while (stop >= 0)
-    {
-        int transition[6][7] = {};
+        Datatype transition[6][7] = {};
         for (int row = start; row >= stop; row--)
         {
             for (int col = 6; col >= 3; col--)
@@ -242,9 +180,54 @@ bool Board::check_diagP(const Player& p) const
     }
     return false;
 }
-
-
-int Board::get_space(const int& row, const int& col) const
+template <typename Datatype>
+bool Board<Datatype>::check_diagN(const Player<Datatype>& p) const
 {
-    return grid[row][col];
+    int start = 5;
+    int shift = 3;
+    int stop = 2;
+    while (stop >= 0)
+    {
+        Datatype transition[6][7] = {};
+        for (int row = start; row >= stop; row--)
+        {
+            for (int col = 0; col < 4; col++)
+            {
+                transition[row][col] = grid[row][col + shift];
+            }
+            shift--;
+        }
+        if (check_vertical(transition, p))
+            return true;
+        stop--;
+        start--;
+        shift = 3;
+    }
+    return false;
+}
+template <typename Datatype>
+bool Board<Datatype>::check_for_tie() const
+{
+    int count = 0;
+    for (int row = 0; row < 6; row++)
+    {
+        for (int col = 0; col < 7; col++)
+        {
+            if (grid[row][col] != empty_space)
+                count++;
+        }
+    }
+    if (count == 42)
+        return true;
+    return false;
+}
+template <typename Datatype>
+void Board<Datatype>::set_winner(const Player<Datatype>& p)
+{
+    winner = p.get_token();
+}
+template <typename Datatype>
+Datatype Board<Datatype>::get_winner() const
+{
+    return winner;
 }
