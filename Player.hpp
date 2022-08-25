@@ -8,7 +8,6 @@
 #ifndef Player_hpp
 #define Player_hpp
 
-#include <stdio.h>
 template <typename Datatype>
 class Player
 {
