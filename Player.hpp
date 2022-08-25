@@ -1,23 +1,22 @@
 //
 //  Player.hpp
-//  Connect4
+//  Template Practice
 //
-//  Created by Brendan Aguiar on 8/6/22.
+//  Created by Brendan Aguiar on 8/24/22.
 //
 
 #ifndef Player_hpp
 #define Player_hpp
-#include <iostream>
-using namespace std;
 
+#include <stdio.h>
+template <typename Datatype>
 class Player
 {
 private:
-    char token;
+     Datatype token;
 public:
-    Player();
-    Player(char _token);
-    char get_token();
+    Player(){};
+    Player(Datatype _token);
+    Datatype get_token() const;
 };
-
 #endif /* Player_hpp */
