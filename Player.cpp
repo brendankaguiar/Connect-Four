@@ -1,13 +1,20 @@
 //
 //  Player.cpp
-//  Connect4
+//  Template Practice
 //
-//  Created by Brendan Aguiar on 8/6/22.
+//  Created by Brendan Aguiar on 8/24/22.
+//
 
 #include "Player.hpp"
-Player::Player(char _token) :token(_token) {}
-Player::Player() {};
-char Player::get_token()
+
+template <typename Datatype>
+Player<Datatype>::Player(Datatype _token)
+{
+    token = _token;
+};
+
+template <typename Datatype>
+Datatype Player<Datatype>::get_token() const
 {
     return token;
 }
